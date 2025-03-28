@@ -1,0 +1,14 @@
+schema: http://localhost:8000/graphql
+
+documents: './src/product_query/**/*.js'   # 👈 Correct path!
+
+generates:
+  ./src/graphql/generated.js:
+    plugins:
+      - typescript-operations
+      - typed-document-node
+      - typescript-react-apollo
+    config:
+      withHooks: true
+      withHOC: false
+      withComponent: false

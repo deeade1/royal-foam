@@ -1,0 +1,71 @@
+services:
+  royal-db:
+    container_name: royal-db
+    image: postgis/postgis:17-3.5
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./.env.dev.db
+    volumes:
+      - royal-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  royal-backend:
+    container_name: royal-backend
+    build:
+      context: .  # The root of the project directory
+      dockerfile: apps/docker/backend/Dockerfile.dev
+    depends_on:
+      royal-db:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./.env.dev
+    volumes:
+      - ./media:/home/apps/backend/media
+      - ./static:/home/apps/backend/static
+      - ./apps/backend:/home/apps/backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  royal-nginx:
+    container_name: royal-nginx
+    build:
+      context: .  # The root of the project directory
+      dockerfile: apps/docker/frontend/Dockerfile.dev
+    ports:
+      - "8081:80"  # External port 8081 to container's 80
+    volumes:
+      - ./media:/home/apps/backend/media
+      - ./static:/home/apps/backend/static
+      - ./apps/docker/nginx/:/etc/nginx/conf.d
+      - ./apps/frontend/dist:/usr/share/nginx/html
+    restart: unless-stopped
+    depends_on:
+      royal-backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  royal-db-data:
+  media:
+  static:
+  backend:
+
+  royal-network:
+    driver: bridge
+    name: royal-dev-network

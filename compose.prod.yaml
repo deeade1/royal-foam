@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: royal-prod-db
+    image: postgis/postgis:17-3.5
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./.env.prod.db
+    volumes:
+      - prod-db-data:/var/lib/postgresql/data
+      - ./docker/postgres/prod/backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      royal-network:
+        aliases:
+          - database
+
+  backend:
+    container_name: royal-prod-backend
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile.prod
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env.prod
+    environment:
+      - GUNICORN_WORKERS=4
+      - GUNICORN_THREADS=2
+    volumes:
+      - prod-media:/home/apps/backend/media
+      - prod-static:/home/apps/backend/static
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - royal-network
+
+  nginx:
+    container_name: royal-prod-nginx
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - prod-media:/var/www/media
+      - prod-static:/var/www/static
+      - ./docker/nginx/prod.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - royal-network
+
+volumes:
+  prod-db-data:
+  prod-media:
+  prod-static:
+
+networks:
+  royal-network:
+    driver: bridge
+    name: royal-prod-network

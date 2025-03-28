@@ -1,0 +1,58 @@
+{
+    "name": "royal-frontend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --mode development",
+        "build": "vite build --mode production",
+        "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+        "preview": "vite preview",
+        "deploy": "npm run build && serve dist",
+        "codegen": "graphql-codegen"
+    },
+    "dependencies": {
+        "@apollo/client": "^3.10.3",
+        "apollo-link-error": "^1.1.13",
+        "apollo-link-token-refresh": "^0.6.1",
+        "axios": "^1.7.2",
+        "bootstrap": "^5.3.3",
+        "dotenv": "^16.4.5",
+        "esbuild": "^0.25.1",
+        "fslightbox-react": "^1.7.6",
+        "graphql": "^16.8.1",
+        "jquery": "^3.7.1",
+        "jwt-decode": "^4.0.0",
+        "react": "19.0.0",
+        "react-bootstrap": "^2.10.2",
+        "react-dom": "19.0.0",
+        "react-dropzone": "^14.2.3",
+        "react-head": "^3.4.2",
+        "react-router-dom": "^6.23.0",
+        "sass": "^1.77.0",
+        "swiper": "^11.1.14",
+        "three": "^0.164.1"
+    },
+    "devDependencies": {
+        "@graphql-codegen/cli": "^5.0.5",
+        "@graphql-codegen/typescript": "^4.1.5",
+        "@graphql-codegen/typescript-operations": "^4.5.1",
+        "@graphql-codegen/typescript-react-apollo": "^4.3.2",
+        "@graphql-tools/merge": "^9.0.4",
+        "@graphql-tools/schema": "^10.0.3",
+        "@graphql-tools/utils": "^10.2.0",
+        "@types/react": "^18.2.66",
+        "@types/react-dom": "^18.2.22",
+        "@vitejs/plugin-react": "^4.3.4",
+        "babel-plugin-react-compiler": "^19.0.0-beta-3229e95-20250315",
+        "eslint": "^8.57.0",
+        "eslint-plugin-react": "^7.34.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "eslint-plugin-react-refresh": "^0.4.6",
+        "undici": "^6.16.1",
+        "vite": "^6.2.2"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.19.0"
+    }
+}

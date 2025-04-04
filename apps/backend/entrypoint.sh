@@ -12,11 +12,6 @@ if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     python manage.py migrate --no-input
 fi
 
-# Start development server
+# Start Django development server with debugpy
 exec python -m debugpy --listen 0.0.0.0:5678 \
-    -m uvicorn backend.asgi:application \
-    --host 0.0.0.0 \
-    --port ${PORT:-8000} \
-    --reload \
-    --reload-dir $APP_HOME \
-    --log-level debug
+    manage.py runserver 0.0.0.0:${PORT:-8000} --verbosity 2

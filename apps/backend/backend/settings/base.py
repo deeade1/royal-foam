@@ -12,8 +12,8 @@ SECRET_KEY = config(
 )
 
 DEBUG = config('DEBUG', cast=bool, default=False)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
-
+#ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')], default='localhost,127.0.0.1')
 # Application Definition
 INSTALLED_APPS = [
     "grappelli",
@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',  
+    'django.contrib.staticfiles',
     "accounts",
     "blog",
     "videos",
@@ -47,15 +47,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-# Authentication and Graphene Settings
+# Authentication
 AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = [
     "graphene_django_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+# Database Configuration (Will be set in specific environments)
+DATABASES = {}
 
 GRAPHENE = {
     "SCHEMA": "backend.schema.schema",
@@ -69,7 +70,6 @@ GRAPHENE = {
     ],
 }
 
-# CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
@@ -81,29 +81,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8080",
 ]
-
-# Database Configuration
-POSTGRES_USER = config('POSTGRES_USER')
-POSTGRES_PASSWORD = config('POSTGRES_PASSWORD')
-POSTGRES_DB = config('POSTGRES_DB')
-PGHOST = config('PGHOST')
-PGPORT = config('PGPORT', cast=int, default=5432)
-
-if all([POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, PGHOST]):
-    print("Using PostgreSQL")
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': POSTGRES_DB,
-            'USER': POSTGRES_USER,
-            'PASSWORD': POSTGRES_PASSWORD,
-            'HOST': PGHOST,
-            'PORT': PGPORT,
-        }
-    }
-else:
-    raise ValueError("Database configuration is incomplete. Please check your environment variables.")
-
 # Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Africa/Lagos"
@@ -113,14 +90,14 @@ USE_TZ = True
 # Static and Media Files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+#STATIC_ROOT = '/usr/share/nginx/html/static/'  # Must match Nginx alias
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 GRAPPELLI_ADMIN_TITLE = "Royal Foam"
-
-
 
 # Templates Configuration
 ROOT_URLCONF = 'backend.urls'
@@ -148,48 +125,13 @@ INTERNAL_IPS = [
     "localhost",
 ]
 
-# Logging Configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django.log',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-}
-
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
-STATICFILES_FINDERS += ['compressor.finders.CompressorFinder']
-
-
-
-
-# settings.py additions for SEO
+# SEO Configuration
 INSTALLED_APPS += [
     'django.contrib.sites',
     'django.contrib.sitemaps',
@@ -198,24 +140,6 @@ INSTALLED_APPS += [
     'compressor',
 ]
 
-MIDDLEWARE.insert(2, 'backend.middleware.CrawlerLogMiddleware')
+MIDDLEWARE.insert(2, 'backend.settings.middleware.CrawlerLogMiddleware')
 
-
-
-# SEO Configuration
 SITE_ID = 1
-
-# Dynamic URL handling
-SITE_URL = 'https://yourdomain.com' if not DEBUG else 'http://localhost:8000'
-ROBOTS_SITEMAP_URLS = [f'{SITE_URL}/sitemap.xml'] if not DEBUG else []
-# Cache settings for SEO content
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'TIMEOUT': 60 * 15,  # 15 minutes
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}

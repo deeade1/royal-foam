@@ -1,4 +1,4 @@
-# In your views.py
+# backend/views.py
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-
+from django.utils.timezone import now
 
 # Category model
 class Category(models.Model):
@@ -29,7 +29,18 @@ class Tag(models.Model):
         return self.name
 
 
-# Post model
+
+
+class PostManager(models.Manager):
+    def get_queryset(self):
+        """Ensure all queries use the base queryset."""
+        return super().get_queryset()
+
+    def published(self):
+        """Returns only published posts with a valid publish_date."""
+        return self.get_queryset().filter(published=True, publish_date__lte=now())
+
+
 class Post(models.Model):
     title = models.CharField(max_length=255, unique=True)
     subtitle = models.CharField(max_length=255, blank=True)
@@ -46,6 +57,8 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     tags = models.ManyToManyField(Tag, blank=True)
     media = models.FileField(upload_to="blog-media", blank=True, null=True)
+
+    objects = PostManager()  # ✅ Assign the custom manager
 
     class Meta:
         ordering = ["-publish_date"]

@@ -1,5 +1,5 @@
 # Production optimized multi-stage build
-ARG PYTHON_VERSION=3.12.3-bookworm
+ARG PYTHON_VERSION=3.13.2-bookworm
 
 # Builder stage
 FROM python:${PYTHON_VERSION} as builder

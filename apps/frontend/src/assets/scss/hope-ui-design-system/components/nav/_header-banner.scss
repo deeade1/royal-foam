@@ -1,0 +1,102 @@
+.rf-banner {
+    &.hide {
+        .rf-navbar-header {
+            display: none;
+        }
+    }
+    .rf-navbar-header {
+        color: $white;
+        .rf-container {
+            padding: calc(var(--bs-gutter-x, 1rem) * 2);
+            h1,h2,h3,h4,h5,h6, a, p {
+                color: inherit;
+            }
+        }
+        .rf-header-img {
+            height: 264px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            z-index: -1;
+            transition: all 400ms;
+            transform-origin: center left;
+            overflow: hidden;
+            border-radius: $border-radius-lg;
+            img {
+                object-fit: cover;
+            }
+        }
+    }
+    &.navs-bg-color {
+        .rf-header-img {
+            background: var(--bs-primary);
+            img {
+                display: none;
+            }
+        }
+    }
+}
+
+.rf-banner:not(.hide)+.content-inner {
+    margin-top: -$spacer * 3 !important;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+.rf-banner{
+    &.navs-bg-color{
+        .rf-navbar-header{
+            .rf-header-img{
+                background-image: var(--bs-primary);
+            }
+        }
+    }
+}
+
+@include media-breakpoint-up(xl) {
+    .rf-banner{
+        &.default, &.navs-bg-color{
+            .rf-navbar{
+                &.navs-transparent, &.nav-glass{
+                    .product-offcanvas{
+                        .breadcrumb-title{
+                            color: $white;
+                            h6{
+                                color: $white;
+                            }
+                        }
+                        .rf-nav-menu{
+                            >.nav-item{
+                                >.menu-arrow{
+                                    color: $white;
+                                }
+                                &.active{
+                                    >.menu-arrow{
+                                        color: var(--bs-primary);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+@include media-breakpoint-down(lg) {
+
+    .rf-banner:not(.hide)+.content-inner {
+        margin-top: 1em !important;
+    }
+
+}
+@include media-breakpoint-down(md) {
+    .rf-banner:not(.hide)+.content-inner {
+        margin-top: 4em !important;
+    }
+
+}
+
+

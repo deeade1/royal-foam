@@ -1,0 +1,89 @@
+# development  Use a specific base image tag for reproducibility
+#ARG PYTHON_VERSION=3.13.2-slim-bookworm 
+ARG PYTHON_VERSION=3.12.3-bookworm
+FROM python:${PYTHON_VERSION} as base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOME=/home/apps \
+    APP_HOME=/home/apps/backend \
+    PIP_TIMEOUT=180 \
+    PIP_RETRIES=10 \
+    PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+
+# Set working directory
+WORKDIR $APP_HOME
+
+# ------------------------- #
+# Builder Stage
+# ------------------------- #
+FROM base as builder
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        python3-dev \
+        libpq-dev \
+        libgeos-dev \
+        libproj-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and configure pip settings
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip config set global.timeout ${PIP_TIMEOUT} && \
+    pip config set global.retries ${PIP_RETRIES} && \
+    pip config set global.index-url ${PIP_INDEX_URL}
+
+# Copy requirements in stages
+COPY apps/backend/requirements.txt .
+
+# Install remaining requirements
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+
+# ------------------------- #
+# Final Stage
+# ------------------------- #
+FROM base
+
+# Install runtime dependencies - using correct package names for Bookworm
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        netcat-traditional \
+        libpq5 \
+        libgeos-c1v5 \
+        libproj25 \
+        proj-bin \
+        proj-data && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy wheels from builder and install
+COPY --from=builder /wheels /wheels
+COPY --from=builder $APP_HOME/requirements.txt .
+RUN pip install --no-cache-dir /wheels/* && \
+    rm -rf /wheels
+
+# Create necessary directories and set ownership
+RUN mkdir -p $APP_HOME/static $APP_HOME/media && \
+    addgroup --gid 1001 --system app && \
+    adduser --uid 1001 --system --ingroup app --no-create-home --shell /bin/false app && \
+    chown -R app:app $APP_HOME
+
+# Copy entrypoint script
+COPY --chown=app:app apps/backend/entrypoint.sh $APP_HOME/
+RUN chmod +x $APP_HOME/entrypoint.sh
+
+# Copy application code
+COPY --chown=app:app apps/backend $APP_HOME/
+
+# Switch to non-root user
+USER app
+
+# Set entrypoint
+ENTRYPOINT ["/home/apps/backend/entrypoint.sh"]
+
+# Optional healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1

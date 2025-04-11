@@ -1,14 +1,14 @@
 services:
   royal-db:
     container_name: royal-db
-    image: ${POSTGRES_IMAGE}  # From .env.prod.db
+    image: ${POSTGRES_IMAGE:-postgres:15}
     env_file:
       - .env.prod.db
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./docker/postgres/backups:/backups
+      - ./db/backups:/backups
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -22,24 +22,15 @@ services:
   royal-backend:
     container_name: royal-backend
     build:
-      context: .
-      dockerfile: apps/docker/backend/Dockerfile
+      context: ./backend
     depends_on:
       royal-db:
         condition: service_healthy
     env_file:
       - .env.prod
-    environment:
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - GUNICORN_WORKERS=4
-      - GUNICORN_THREADS=2
     volumes:
-      - media:/home/apps/backend/media
-      - static:/home/apps/backend/static
+      - media:/home/app/backend/media
+      - static:/home/app/backend/static
     restart: unless-stopped
     networks:
       - royal-network
@@ -53,8 +44,8 @@ services:
     volumes:
       - media:/var/www/media
       - static:/var/www/static
-      - ./apps/docker/nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./apps/docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       royal-backend:
         condition: service_healthy

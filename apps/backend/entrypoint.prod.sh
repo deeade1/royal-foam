@@ -5,7 +5,8 @@ echo "==> Starting Backend Setup..."
 
 # Wait for database to be ready
 echo "Waiting for PostgreSQL to be ready..."
-until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$POSTGRES_USER"; do
+
+until pg_isready -h "${DB_HOST:-royal-db}" -p "${DB_PORT:-5432}" -U "${POSTGRES_USER}"; do
   sleep 2
 done
 

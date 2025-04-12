@@ -22,7 +22,8 @@ WORKDIR /app
 
 # Copy only requirements for caching
 #COPY requirements.txt .
-COPY apps/backend/requirements.txt .
+COPY ./requirements.txt .
+
 
 # Install pip & wheel
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
@@ -66,7 +67,8 @@ RUN mkdir -p $APP_HOME/static $APP_HOME/media && \
 COPY --chown=app:app . .
 
 # Add and configure entrypoint
-COPY apps/backend/entrypoint.prod.sh /entrypoint.sh
+
+COPY ./entrypoint.prod.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && dos2unix /entrypoint.sh
 
 USER app

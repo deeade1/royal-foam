@@ -27,7 +27,7 @@ COPY --from=builder /apps/frontend/dist .
 
 # Copy custom Nginx config
 
-COPY ./apps/nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
+COPY apps/nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
 
 # Fix permissions
 RUN mkdir -p /var/cache/nginx /var/run/nginx /var/lib/nginx && \

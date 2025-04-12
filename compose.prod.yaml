@@ -2,8 +2,10 @@ services:
   royal-db:
     container_name: royal-db
     image: ${POSTGRES_IMAGE:-postgres:17.4-bookworm}
+   
     env_file:
-      - .env.prod.db
+      - /home/ubuntu/royal-foam/.env.prod.db
+
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:

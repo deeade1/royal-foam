@@ -42,11 +42,13 @@ ENV ENVIRONMENT=production \
 RUN addgroup --gid 1001 app && \
     adduser --disabled-password --uid 1001 --ingroup app --no-create-home --shell /usr/sbin/nologin app
 
+
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     libgeos-c1v5 \
     libproj25 \
+    postgresql-client \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

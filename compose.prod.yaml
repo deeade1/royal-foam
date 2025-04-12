@@ -49,7 +49,7 @@ services:
     volumes:
       - media:/var/www/media
       - static:/var/www/static
-      - ./nginx:/etc/nginx/conf.d:ro
+      - ./apps/nginx:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       royal-backend:

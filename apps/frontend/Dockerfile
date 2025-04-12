@@ -26,7 +26,7 @@ WORKDIR /usr/share/nginx/html
 COPY --from=builder /apps/frontend/dist .
 
 # Copy custom Nginx config
-COPY apps/docker/frontend/nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
+COPY apps/frontend/nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
 
 # ✅ Fix permissions on nginx cache, run dir, lib dir, frontend files
 RUN mkdir -p /var/cache/nginx /var/run/nginx /var/lib/nginx && \

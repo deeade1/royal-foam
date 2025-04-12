@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libgeos-dev \
     libproj-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory

@@ -10,6 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    dos2unix \
     build-essential \
     gcc \
     libpq-dev \

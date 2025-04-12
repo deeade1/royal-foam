@@ -41,8 +41,8 @@ services:
   royal-nginx:
     container_name: royal-nginx
     build:
-      context: ./apps/frontend  # Fixed indentation and path
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/frontend/Dockerfile
     ports:
       - "80:80"
       - "443:443"

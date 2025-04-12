@@ -10,7 +10,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    dos2unix \
     build-essential \
     gcc \
     libpq-dev \
@@ -70,7 +69,8 @@ COPY --chown=app:app . .
 # Add and configure entrypoint
 
 COPY ./entrypoint.prod.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && dos2unix /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    sed -i 's/\r$//' /entrypoint.sh  # Removes Windows line endings
 
 USER app
 

@@ -26,20 +26,14 @@ WORKDIR /usr/share/nginx/html
 COPY --from=builder /apps/frontend/dist .
 
 # Copy custom Nginx config
+COPY ./nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
 
-COPY nginx/nginx.prod.conf /etc/nginx/conf.d/default.conf
-
-
-# ✅ Fix permissions on nginx cache, run dir, lib dir, frontend files
+# Fix permissions
 RUN mkdir -p /var/cache/nginx /var/run/nginx /var/lib/nginx && \
     chown -R nginx:nginx /var/cache/nginx /var/run/nginx /var/lib/nginx && \
     chmod -R 755 /var/cache/nginx /var/run/nginx /var/lib/nginx && \
     chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
-# Secure Nginx config permissions
-RUN chmod 644 /etc/nginx/conf.d/default.conf
-
-#USER nginx
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

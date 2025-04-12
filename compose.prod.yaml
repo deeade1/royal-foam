@@ -23,7 +23,6 @@ services:
     container_name: royal-backend
     build:
       context: ./apps/backend
-      target: production
     env_file:
       - .env.prod
     depends_on:

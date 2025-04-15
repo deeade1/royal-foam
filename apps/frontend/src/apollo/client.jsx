@@ -127,6 +127,7 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
+  uri: 'http://localhost:8000/graphql/',
   cache: new InMemoryCache(),
 });
 

@@ -2,16 +2,17 @@
 set -euo pipefail
 
 # Environment variables with defaults
-DB_HOST=${DB_HOST:-royal-db}
-DB_PORT=${DB_PORT:-5432}
+DB_HOST=${PGHOST:-royal-db}
+DB_PORT=${PGPORT:-5432}
 PORT=${PORT:-8000}
 
 # Wait for database if needed
 if [ "${DB_WAIT:-false}" = "true" ]; then
-    echo "Waiting for database at $DB_HOST:$DB_PORT..."
-    until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
+    echo "Waiting for database at $PGHOST:$PGPORT..."
+    until nc -z "$PGHOST" "$PGPORT"; do
         sleep 2
     done
+    
     echo "Database is ready!"
 fi
 

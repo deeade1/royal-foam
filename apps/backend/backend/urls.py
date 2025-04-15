@@ -13,7 +13,8 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('health/', health_check, name='health_check'),
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG))),
+    path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    
 ]
 
 if settings.DEBUG:

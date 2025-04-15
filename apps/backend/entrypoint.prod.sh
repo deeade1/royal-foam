@@ -1,14 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
+# Environment variables with defaults
+DB_HOST=${PGHOST:-royal-db}
+DB_PORT=${PGPORT:-5432}
+PORT=${PORT:-8000}
+
 echo "==> Starting Backend Setup..."
 
 # Wait for database to be ready
 echo "Waiting for PostgreSQL to be ready..."
 
-until pg_isready -h "${DB_HOST:-royal-db}" -p "${DB_PORT:-5432}" -U "${POSTGRES_USER:-royal-foam}"; do
-  sleep 2
-done
+
+# Wait for database if needed
+if [ "${DB_WAIT:-false}" = "true" ]; then
+    echo "Waiting for database at $PGHOST:$PGPORT..."
+    until nc -z "$PGHOST" "$PGPORT"; do
+        sleep 2
+    done
+    
+    echo "Database is ready!"
+fi
 
 
 # Run Django setup commands

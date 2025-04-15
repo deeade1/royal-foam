@@ -22,18 +22,19 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile.dev
+    environment:
+        DB_WAIT: "true"
+        MAKE_MIGRATIONS: "true"
+        RUN_MIGRATIONS: "true"
+        COLLECT_STATIC: "true" 
+        DJANGO_SETTINGS_MODULE: backend.settings.development
+        PYTHONPATH: /home/apps/backend
     depends_on:
       royal-db:
         condition: service_healthy
     ports:
       - "8000:8000"
-    environment:
-      - DJANGO_SETTINGS_MODULE=backend.settings.development
-      - PYTHONPATH=/home/apps/backend
-      - DB_WAIT: "true"
-      - MAKE_MIGRATIONS: "true"
-      - RUN_MIGRATIONS: "true"
-      - COLLECT_STATIC: "true"
+      
     env_file:
       - ./.env.dev
     volumes:

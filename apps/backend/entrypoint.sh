@@ -15,6 +15,12 @@ if [ "${DB_WAIT:-false}" = "true" ]; then
     echo "Database is ready!"
 fi
 
+# Run makemigrations if needed
+if [ "${MAKE_MIGRATIONS:-false}" = "true" ]; then
+    echo "Running makemigrations..."
+    python manage.py makemigrations --no-input
+fi
+
 # Run migrations if needed
 if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     echo "Running migrations..."

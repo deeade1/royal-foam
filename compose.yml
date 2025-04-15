@@ -30,6 +30,10 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=backend.settings.development
       - PYTHONPATH=/home/apps/backend
+      - DB_WAIT: "true"
+      - MAKE_MIGRATIONS: "true"
+      - RUN_MIGRATIONS: "true"
+      - COLLECT_STATIC: "true"
     env_file:
       - ./.env.dev
     volumes:
